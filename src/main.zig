@@ -136,3 +136,20 @@ pub fn main() !void {
 
     std.debug.print("index two: {s}", .{index_two.?});
 }
+
+test "delete" {
+    var allocator = std.heap.page_allocator;
+    const strings = [_][]const u8{ "one", "two", "three", "four", "five", "six", "seven" };
+    var list = DLL{};
+    defer list.deinit(&allocator);
+
+    for (strings) |string| {
+        try list.insert(&allocator, string);
+    }
+
+    list.delete("three", &allocator);
+
+    const index_two = list.read(2);
+
+    try std.testing.expect(std.ascii.eqlIgnoreCase(index_two.?, "four"));
+}
